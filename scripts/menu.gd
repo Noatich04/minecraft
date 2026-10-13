@@ -177,7 +177,7 @@ func _build_modes() -> void:
 	style.content_margin_bottom = 14
 	card.add_theme_stylebox_override("panel", style)
 	var description := Label.new()
-	description.text = "ĐẤU SÚNG FPS • PHONG CÁCH KHỐI\\nĐấu với 5 bot, ngắm bắn góc nhìn thứ nhất.\\nHạ 15 bot trước khi hết 3 phút để chiến thắng.\\nCó đạn, nạp đạn, máu và vật cản dạng khối."
+	description.text = "ĐẤU SÚNG FPS • ĐẤU ĐỘI 5VS5\\nĐội bạn: bạn + 4 đồng đội bot. Đội địch: 5 bot.\\nĐội thắng hiệp khi hạ toàn bộ đối phương.\\nĐổi bên ở 7 hiệp thắng; đạt 10 hiệp thắng để thắng trận."
 	description.add_theme_font_size_override("font_size", 17)
 	description.add_theme_color_override("font_color", Color("#e6eee0"))
 	card.add_child(description)
