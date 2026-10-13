@@ -37,8 +37,8 @@ func _process(delta: float) -> void:
 func _build_environment() -> void:
 	var environment_node := WorldEnvironment.new()
 	var env := Environment.new()
-	env.background_mode = Environment.BG_SKY
-	env.sky = Sky.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.48, 0.72, 0.94, 1)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.72, 0.80, 0.92)
 	env.ambient_light_energy = 0.8
