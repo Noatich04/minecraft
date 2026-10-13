@@ -5,7 +5,7 @@ const MOB_SCENE = preload("res://scenes/mob.tscn")
 const SAVE_PATH := "user://voxel_world.json"
 
 var world: VoxelWorld
-var player: CharacterBody3D
+var player: VoxelPlayer
 var hud_label: Label
 var help_label: Label
 var inventory_panel: PanelContainer
