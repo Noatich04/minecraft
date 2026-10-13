@@ -10,7 +10,7 @@ const GRAVITY := 20.0
 var world: VoxelWorld
 var health := 20
 var hunger := 20
-var inventory: Dictionary = {1: 12, 2: 20, 3: 8, 4: 4, 5: 0, 6: 0}
+var inventory: Dictionary = {1: 12, 2: 20, 3: 8, 4: 4, 5: 0, 6: 0, 7: 0}
 var selected_block := 1
 var survival_clock := 0.0
 
@@ -37,6 +37,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				selected_block = VoxelWorld.WOOD
 			KEY_5:
 				selected_block = VoxelWorld.LEAVES
+			KEY_6:
+				selected_block = VoxelWorld.PLANKS
 			KEY_F5:
 				get_parent().save_game()
 			KEY_F9:
@@ -139,12 +141,13 @@ func place_block() -> void:
 		get_parent().refresh_hud()
 
 func craft_recipe() -> void:
-	if int(inventory.get(VoxelWorld.DIRT, 0)) >= 2:
-		inventory[VoxelWorld.DIRT] = int(inventory[VoxelWorld.DIRT]) - 2
-		inventory[VoxelWorld.STONE] = int(inventory.get(VoxelWorld.STONE, 0)) + 1
-		get_parent().show_message("Đã chế tạo 1 đá từ 2 đất")
+	# One log creates four planks, a familiar starter crafting recipe.
+	if int(inventory.get(VoxelWorld.WOOD, 0)) >= 1:
+		inventory[VoxelWorld.WOOD] = int(inventory[VoxelWorld.WOOD]) - 1
+		inventory[VoxelWorld.PLANKS] = int(inventory.get(VoxelWorld.PLANKS, 0)) + 4
+		get_parent().show_message("Đã chế tạo 4 ván gỗ. Nhấn 6 để chọn ván.")
 	else:
-		get_parent().show_message("Cần 2 khối đất để chế tạo 1 đá")
+		get_parent().show_message("Cần ít nhất 1 khối gỗ để chế tạo ván.")
 	get_parent().refresh_hud()
 
 func save_player() -> Dictionary:
