@@ -132,9 +132,11 @@ func _build_bots() -> void:
 	_spawn_enemies()
 
 func _spawn_allies() -> void:
+	var z_near := -13.0 if side_switched else 13.0
+	var z_back := -16.0 if side_switched else 16.0
 	var positions := [
-		Vector3(-4, 1.1, 13), Vector3(4, 1.1, 13),
-		Vector3(-9, 1.1, 16), Vector3(9, 1.1, 16)
+		Vector3(-4, 1.1, z_near), Vector3(4, 1.1, z_near),
+		Vector3(-9, 1.1, z_back), Vector3(9, 1.1, z_back)
 	]
 	for i in range(4):
 		_spawn_bot(positions[i], true)
@@ -234,8 +236,8 @@ func _process(delta: float) -> void:
 	if round_time <= 0.0:
 		_finish_round(false, "Hết giờ")
 		return
-	if health <= 0:
-		_finish_round(false, "Bạn đã bị hạ")
+	if health <= 0 and allies.is_empty():
+		_finish_round(false, "Toàn đội xanh đã bị hạ")
 		return
 	if bots.is_empty():
 		_finish_round(true, "Đã tiêu diệt toàn bộ 5 địch")
@@ -247,15 +249,16 @@ func _physics_process(delta: float) -> void:
 		return
 	if not player:
 		return
-	if not player.is_on_floor():
-		player.velocity.y -= 22.0 * delta
-	if Input.is_key_pressed(KEY_SPACE) and player.is_on_floor():
-		player.velocity.y = 7.0
-	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var direction := (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	player.velocity.x = direction.x * 7.0
-	player.velocity.z = direction.z * 7.0
-	player.move_and_slide()
+	if health > 0:
+		if not player.is_on_floor():
+			player.velocity.y -= 22.0 * delta
+		if Input.is_key_pressed(KEY_SPACE) and player.is_on_floor():
+			player.velocity.y = 7.0
+		var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+		var direction := (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		player.velocity.x = direction.x * 7.0
+		player.velocity.z = direction.z * 7.0
+		player.move_and_slide()
 	# Both teams seek opponents and exchange fire.
 	for bot in allies.duplicate():
 		_process_combat_bot(bot, bots, true, delta)
@@ -330,7 +333,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_shoot()
 
 func _shoot() -> void:
-	if reloading or fire_cooldown > 0.0:
+	if health <= 0 or reloading or fire_cooldown > 0.0:
 		return
 	if ammo <= 0:
 		_start_reload()
