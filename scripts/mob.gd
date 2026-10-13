@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 var health := 5
 var attack_timer := 0.0
-var player: CharacterBody3D
+var player: VoxelPlayer
 
 func _ready() -> void:
 	add_to_group("mobs")
