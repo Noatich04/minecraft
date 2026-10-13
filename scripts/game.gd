@@ -117,7 +117,7 @@ func refresh_hud() -> void:
 
 func _update_inventory_panel() -> void:
 	var inventory: Dictionary = player.inventory
-	inventory_label.text = "TÚI ĐỒ & CHẾ TẠO\n\nCỏ: %d\nĐất: %d\nĐá: %d\nGỗ: %d\nLá: %d\nCát: %d\n\nNhấn C: 1 gỗ -> 4 ván\nNhấn 6 để chọn ván\nNhấn E để đóng túi đồ" % [
+	inventory_label.text = "TÚI ĐỒ & CHẾ TẠO\n\nCỏ: %d\nĐất: %d\nĐá: %d\nGỗ: %d\nLá: %d\nCát: %d\nVán gỗ: %d\n\nNhấn C: 1 gỗ -> 4 ván\nNhấn 6 để chọn ván\nNhấn E để đóng túi đồ" % [
 		int(inventory.get(1, 0)), int(inventory.get(2, 0)), int(inventory.get(3, 0)),
 		int(inventory.get(4, 0)), int(inventory.get(5, 0)), int(inventory.get(6, 0))
 	]
