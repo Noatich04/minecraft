@@ -1,8 +1,10 @@
 extends Node3D
 
-const BOT_COUNT := 5
-const KILLS_TO_WIN := 15
+const ENEMIES_PER_ROUND := 5
+const WINS_TO_MATCH := 10
+const SIDE_SWITCH_AT := 7
 const ROUND_LENGTH := 180.0
+const ROUND_BREAK := 2.5
 const MAGAZINE_SIZE := 30
 
 var player: CharacterBody3D
@@ -14,6 +16,11 @@ var health := 100
 var ammo := MAGAZINE_SIZE
 var reserve_ammo := 120
 var kills := 0
+var player_round_wins := 0
+var enemy_round_wins := 0
+var round_number := 1
+var side_switched := false
+var intermission_time := 0.0
 var round_time := ROUND_LENGTH
 var fire_cooldown := 0.0
 var reload_time := 0.0
@@ -125,7 +132,7 @@ func _build_bots() -> void:
 		Vector3(-13, 1.1, 7), Vector3(13, 1.1, -2),
 		Vector3(0, 1.1, -16)
 	]
-	for i in range(BOT_COUNT):
+	for i in range(ENEMIES_PER_ROUND):
 		_spawn_bot(positions[i])
 
 func _spawn_bot(pos: Vector3) -> void:
@@ -194,6 +201,11 @@ func _build_hud() -> void:
 func _process(delta: float) -> void:
 	if round_over:
 		return
+	if intermission_time > 0.0:
+		intermission_time -= delta
+		if intermission_time <= 0.0:
+			_begin_next_round()
+		return
 	if fire_cooldown > 0.0:
 		fire_cooldown -= delta
 	if reloading:
@@ -207,18 +219,18 @@ func _process(delta: float) -> void:
 			_update_hud()
 	round_time = maxf(0.0, round_time - delta)
 	if round_time <= 0.0:
-		_end_round("HẾT GIỜ! Bạn hạ được %d/%d bot." % [kills, KILLS_TO_WIN])
+		_finish_round(false, "Hết giờ")
 		return
 	if health <= 0:
-		_end_round("BẠN ĐÃ THUA! Nhấn Enter để chơi lại.")
+		_finish_round(false, "Bạn đã bị hạ")
 		return
-	if kills >= KILLS_TO_WIN:
-		_end_round("CHIẾN THẮNG! Bạn đã hạ đủ %d bot." % KILLS_TO_WIN)
+	if bots.is_empty():
+		_finish_round(true, "Đã tiêu diệt toàn bộ 5 địch")
 		return
 	_update_hud()
 
 func _physics_process(delta: float) -> void:
-	if round_over:
+	if round_over or intermission_time > 0.0:
 		return
 	if not player:
 		return
@@ -292,12 +304,10 @@ func _shoot() -> void:
 				bots.erase(target)
 				target.queue_free()
 				kills += 1
-				if not round_over:
-					_spawn_bot(_random_bot_spawn())
 	_update_hud()
 
 func _random_bot_spawn() -> Vector3:
-	var spots := [Vector3(-14, 1.1, -14), Vector3(14, 1.1, -14), Vector3(-14, 1.1, 10), Vector3(14, 1.1, 5), Vector3(0, 1.1, -16)]
+	var spots := _enemy_spawn_positions()
 	return spots[randi() % spots.size()]
 
 func _start_reload() -> void:
