@@ -323,10 +323,59 @@ func _update_hud() -> void:
 	var minutes := int(round_time) / 60
 	var seconds := int(round_time) % 60
 	var ammo_text := "ĐANG NẠP..." if reloading else "%d / %d" % [ammo, reserve_ammo]
-	hud.text = "MÁU: %d   |   ĐẠN: %s\nBOT: %d / %d   |   THỜI GIAN: %02d:%02d" % [health, ammo_text, kills, KILLS_TO_WIN, minutes, seconds]
+	var side_text := "BÊN B" if side_switched else "BÊN A"
+	var switch_text := "ĐÃ ĐỔI BÊN" if side_switched else "ĐỔI BÊN KHI ĐẠT 7 HIỆP"
+	hud.text = "HIỆP %d   |   TỶ SỐ %d - %d\\n%s   |   MÁU: %d   |   ĐẠN: %s\\nĐỊCH CÒN: %d/5   |   %s   |   %02d:%02d" % [round_number, player_round_wins, enemy_round_wins, side_text, health, ammo_text, bots.size(), switch_text, minutes, seconds]
 
-func _end_round(message: String) -> void:
-	round_over = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	center_message.text = message + "\nNhấn Enter để chơi lại"
+func _finish_round(player_won: bool, reason: String) -> void:
+	if round_over or intermission_time > 0.0:
+		return
+	if player_won:
+		player_round_wins += 1
+	else:
+		enemy_round_wins += 1
+	_update_hud()
+	if player_round_wins >= WINS_TO_MATCH or enemy_round_wins >= WINS_TO_MATCH:
+		round_over = true
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		var result := "CHIẾN THẮNG CHUNG CUỘC!" if player_round_wins >= WINS_TO_MATCH else "THUA TRẬN!"
+		center_message.text = "%s\\nTỶ SỐ CUỐI: %d - %d\\nNhấn Enter để chơi lại" % [result, player_round_wins, enemy_round_wins]
+		center_message.visible = true
+		return
+	if not side_switched and (player_round_wins >= SIDE_SWITCH_AT or enemy_round_wins >= SIDE_SWITCH_AT):
+		side_switched = true
+		center_message.text = "ĐỔI BÊN!\\nHai bên đổi vị trí hồi sinh.\\n%s\\nTỶ SỐ: %d - %d" % [("Bạn thắng hiệp!" if player_won else "Đội địch thắng hiệp!"), player_round_wins, enemy_round_wins]
+	else:
+		center_message.text = "%s\\n%s\\nTỶ SỐ: %d - %d" % [("THẮNG HIỆP!" if player_won else "THUA HIỆP!"), reason, player_round_wins, enemy_round_wins]
 	center_message.visible = true
+	intermission_time = ROUND_BREAK
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _begin_next_round() -> void:
+	round_number = player_round_wins + enemy_round_wins + 1
+	kills = 0
+	health = 100
+	ammo = MAGAZINE_SIZE
+	reserve_ammo = 120
+	reloading = false
+	reload_time = 0.0
+	round_time = ROUND_LENGTH
+	fire_cooldown = 0.0
+	for bot in bots:
+		if is_instance_valid(bot):
+			bot.queue_free()
+	bots.clear()
+	player.position = Vector3(0, 1.2, -15 if side_switched else 15)
+	player.velocity = Vector3.ZERO
+	player.rotation = Vector3.ZERO
+	camera.rotation = Vector3.ZERO
+	for pos in _enemy_spawn_positions():
+		_spawn_bot(pos)
+	center_message.visible = false
+	_update_hud()
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _enemy_spawn_positions() -> Array[Vector3]:
+	if side_switched:
+		return [Vector3(-12, 1.1, 12), Vector3(12, 1.1, 12), Vector3(-13, 1.1, -7), Vector3(13, 1.1, 2), Vector3(0, 1.1, 16)]
+	return [Vector3(-12, 1.1, -12), Vector3(12, 1.1, -12), Vector3(-13, 1.1, 7), Vector3(13, 1.1, -2), Vector3(0, 1.1, -16)]
