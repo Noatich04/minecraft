@@ -6,7 +6,7 @@ var player: VoxelPlayer
 
 func _ready() -> void:
 	add_to_group("mobs")
-	player = get_parent().get_node("Player") as CharacterBody3D
+	player = get_parent().get_node("Player") as VoxelPlayer
 
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(player):
