@@ -32,4 +32,8 @@ func _physics_process(delta: float) -> void:
 func take_hit(damage: int = 1) -> void:
 	health -= damage
 	if health <= 0:
+		if is_instance_valid(player):
+			player.inventory[108] = int(player.inventory.get(108, 0)) + 1
+			player.get_parent().show_message("Hạ slime! Nhận được 1 gel slime.")
+			player.get_parent().refresh_hud()
 		queue_free()
