@@ -19,7 +19,7 @@ func _ready() -> void:
 	world = VoxelWorld.new()
 	world.name = "World"
 	add_child(world)
-	player = PLAYER_SCENE.instantiate()
+	player = PLAYER_SCENE.instantiate() as VoxelPlayer
 	player.name = "Player"
 	add_child(player)
 	player.global_position = Vector3(32.5, world.terrain_height(32, 32) + 4.0, 32.5)
@@ -95,7 +95,7 @@ func _spawn_mobs() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	for i in range(8):
-		var mob := MOB_SCENE.instantiate()
+		var mob := MOB_SCENE.instantiate() as CharacterBody3D
 		mob.name = "Slime_%d" % i
 		add_child(mob)
 		var x := rng.randi_range(8, VoxelWorld.WORLD_SIZE - 8)
