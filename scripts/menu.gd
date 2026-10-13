@@ -5,6 +5,7 @@ const WORLD_SCENE := "res://scenes/game_world.tscn"
 var home_panel: VBoxContainer
 var servers_panel: VBoxContainer
 var settings_panel: VBoxContainer
+var modes_panel: VBoxContainer
 var footer_label: Label
 
 func _ready() -> void:
