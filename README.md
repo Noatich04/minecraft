@@ -8,7 +8,7 @@ Prototype game voxel sinh tồn lấy cảm hứng từ Minecraft, viết bằng
 - Mesh và va chạm được ghép theo chunk 16 × 16 để tránh tạo một physics body cho từng khối.
 - Góc nhìn người thứ nhất, di chuyển WASD, nhảy, trọng lực và va chạm với địa hình.
 - Phá khối bằng chuột trái, nhặt khối vào túi đồ; đặt khối bằng chuột phải.
-- Thanh chọn nhanh 1–5, giao diện túi đồ E và công thức chế tạo mẫu C (1 gỗ → 4 ván gỗ).
+- Thanh chọn nhanh 1–6, giao diện túi đồ E và công thức chế tạo mẫu C (1 gỗ → 4 ván gỗ).
 - Slime đuổi theo người chơi, gây sát thương; đánh slime bằng chuột trái.
 - Máu, đói và hồi sinh; lưu/tải seed thế giới, các khối đã sửa, vị trí, máu, đói và túi đồ.
 - Tệp lưu nằm trong `user://voxel_world.json` của Godot, không nằm trong thư mục repository.
@@ -36,9 +36,9 @@ Prototype game voxel sinh tồn lấy cảm hứng từ Minecraft, viết bằng
 | Chuột | Nhìn xung quanh |
 | Chuột trái | Phá khối hoặc đánh slime |
 | Chuột phải | Đặt khối đang chọn |
-| 1–5 | Chọn cỏ / đất / đá / gỗ / lá |
+| 1–6 | Chọn cỏ / đất / đá / gỗ / lá / ván gỗ |
 | E | Mở hoặc đóng túi đồ |
-| C | Chế tạo công thức mẫu |
+| C | Chế tạo 1 gỗ thành 4 ván gỗ |
 | F5 | Lưu thế giới |
 | F9 | Tải lần lưu gần nhất |
 | Esc | Thả chuột |
