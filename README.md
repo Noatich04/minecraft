@@ -33,6 +33,18 @@ Prototype game voxel sinh tồn lấy cảm hứng từ Minecraft, viết bằng
 | Esc | Thả chuột |
 | Enter | Chơi lại sau khi kết thúc ván |
 
+## Điều khiển chế độ đấu súng FPS
+
+| Phím | Tác dụng |
+|---|---|
+| W / A / S / D | Di chuyển |
+| Space | Nhảy |
+| Chuột | Ngắm nhìn |
+| Chuột trái | Bắn súng |
+| R | Nạp đạn |
+| Esc | Thả chuột |
+| Enter | Chơi lại sau khi kết thúc ván |
+
 ## Điều khiển trong game
 
 | Phím | Tác dụng |
