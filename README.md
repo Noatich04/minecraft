@@ -11,19 +11,19 @@ Prototype game voxel sinh tồn lấy cảm hứng từ Minecraft, viết bằng
 - Thanh chọn nhanh 1–5, giao diện túi đồ E và công thức chế tạo mẫu C (2 đất → 1 đá).
 - Slime đuổi theo người chơi, gây sát thương; đánh slime bằng chuột trái.
 - Máu, đói và hồi sinh; lưu/tải seed thế giới, các khối đã sửa, vị trí, máu, đói và túi đồ.
-- Tệp lưu nằm trong \x60user://voxel_world.json\x60 của Godot, không nằm trong thư mục repository.
+- Tệp lưu nằm trong `user://voxel_world.json` của Godot, không nằm trong thư mục repository.
 
 ## Cách chạy trên Windows
 
 1. Cài Godot Engine **4.3 trở lên** từ https://godotengine.org/download/.
 2. Mở Git Bash hoặc Terminal và chạy:
 
-   \x60\x60\x60bash
+   ```bash
    git clone https://github.com/Noatich04/minecraft.git
    cd minecraft
-   \x60\x60\x60
+   ```
 
-3. Mở Godot Project Manager → **Import** → chọn file \x60project.godot\x60 trong thư mục vừa tải.
+3. Mở Godot Project Manager → **Import** → chọn file `project.godot` trong thư mục vừa tải.
 4. Mở project, đợi import/scan hoàn tất rồi nhấn **F6** để chạy scene hiện tại hoặc **F5** để chạy project.
 5. Nhấp vào cửa sổ game để bắt chuột. Nhấn **Esc** để thả chuột; nhấp lại để bắt chuột lần nữa.
 
