@@ -5,6 +5,8 @@ const WORLD_SCENE := "res://scenes/game_world.tscn"
 var home_panel: VBoxContainer
 var servers_panel: VBoxContainer
 var settings_panel: VBoxContainer
+var modes_panel: VBoxContainer
+var modes_panel: VBoxContainer
 var footer_label: Label
 
 func _ready() -> void:
@@ -12,6 +14,7 @@ func _ready() -> void:
 	_build_home()
 	_build_servers()
 	_build_settings()
+	_build_modes()
 	_show_panel(home_panel)
 
 func _draw() -> void:
@@ -67,6 +70,7 @@ func _build_home() -> void:
 	home_panel.add_child(subtitle)
 	_add_spacer(home_panel, 8)
 	_add_button(home_panel, "CHƠI ĐƠN", _start_world, true)
+	_add_button(home_panel, "ĐẤU SÚNG FPS", _show_modes)
 	_add_button(home_panel, "MÁY CHỦ", _show_servers)
 	_add_button(home_panel, "CÀI ĐẶT", _show_settings)
 	_add_button(home_panel, "THOÁT GAME", _quit_game)
@@ -146,6 +150,42 @@ func _build_settings() -> void:
 	settings_panel.add_child(controls)
 	_add_button(settings_panel, "QUAY LẠI", _show_home)
 
+
+func _build_modes() -> void:
+	modes_panel = VBoxContainer.new()
+	modes_panel.alignment = BoxContainer.ALIGNMENT_CENTER
+	modes_panel.add_theme_constant_override("separation", 14)
+	modes_panel.set_anchors_preset(Control.PRESET_CENTER)
+	modes_panel.position = Vector2(-290, -225)
+	modes_panel.size = Vector2(580, 450)
+	add_child(modes_panel)
+	var title := Label.new()
+	title.text = "CHỌN CHẾ ĐỘ CHƠI"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 32)
+	title.add_theme_color_override("font_color", Color("#f2f4e8"))
+	modes_panel.add_child(title)
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(540, 145)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.07, 0.10, 0.12, 0.94)
+	style.border_color = Color("#b5c994")
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(4)
+	style.content_margin_left = 18
+	style.content_margin_right = 18
+	style.content_margin_top = 14
+	style.content_margin_bottom = 14
+	card.add_theme_stylebox_override("panel", style)
+	var description := Label.new()
+	description.text = "ĐẤU SÚNG FPS • PHONG CÁCH KHỐI\\nĐấu với 5 bot, ngắm bắn góc nhìn thứ nhất.\\nHạ 15 bot trước khi hết 3 phút để chiến thắng.\\nCó đạn, nạp đạn, máu và vật cản dạng khối."
+	description.add_theme_font_size_override("font_size", 17)
+	description.add_theme_color_override("font_color", Color("#e6eee0"))
+	card.add_child(description)
+	modes_panel.add_child(card)
+	_add_button(modes_panel, "BẮT ĐẦU ĐẤU SÚNG", _start_shooter, true)
+	_add_button(modes_panel, "QUAY LẠI", _show_home)
+
 func _add_button(parent: VBoxContainer, caption: String, callback: Callable, primary := false) -> void:
 	var button := Button.new()
 	button.text = caption
@@ -178,6 +218,7 @@ func _show_panel(panel: Control) -> void:
 	home_panel.visible = panel == home_panel
 	servers_panel.visible = panel == servers_panel
 	settings_panel.visible = panel == settings_panel
+	modes_panel.visible = panel == modes_panel
 
 func _show_home() -> void:
 	_show_panel(home_panel)
@@ -188,10 +229,18 @@ func _show_servers() -> void:
 func _show_settings() -> void:
 	_show_panel(settings_panel)
 
+func _show_modes() -> void:
+	_show_panel(modes_panel)
+
 func _start_world() -> void:
 	var error := get_tree().change_scene_to_file(WORLD_SCENE)
 	if error != OK:
 		push_error("Không thể mở thế giới: %s" % error)
+
+func _start_shooter() -> void:
+	var error := get_tree().change_scene_to_file("res://scenes/shooter_mode.tscn")
+	if error != OK:
+		push_error("Không thể mở chế độ đấu súng: %s" % error)
 
 func _quit_game() -> void:
 	get_tree().quit()
