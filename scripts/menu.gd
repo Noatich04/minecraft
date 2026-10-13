@@ -51,8 +51,8 @@ func _build_home() -> void:
 	home_panel.alignment = BoxContainer.ALIGNMENT_CENTER
 	home_panel.add_theme_constant_override("separation", 14)
 	home_panel.set_anchors_preset(Control.PRESET_CENTER)
-	home_panel.position = Vector2(-210, -180)
-	home_panel.size = Vector2(420, 410)
+	home_panel.position = Vector2(-245, -240)
+	home_panel.size = Vector2(490, 490)
 	add_child(home_panel)
 
 	var title := Label.new()
