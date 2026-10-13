@@ -10,6 +10,7 @@ const MAGAZINE_SIZE := 30
 var player: CharacterBody3D
 var camera: Camera3D
 var bots: Array[CharacterBody3D] = []
+var allies: Array[CharacterBody3D] = []
 var hud: Label
 var center_message: Label
 var health := 100
@@ -127,19 +128,27 @@ func _build_player() -> void:
 	add_child(player)
 
 func _build_bots() -> void:
-	var positions := [
-		Vector3(-12, 1.1, -12), Vector3(12, 1.1, -12),
-		Vector3(-13, 1.1, 7), Vector3(13, 1.1, -2),
-		Vector3(0, 1.1, -16)
-	]
-	for i in range(ENEMIES_PER_ROUND):
-		_spawn_bot(positions[i])
+	_spawn_allies()
+	_spawn_enemies()
 
-func _spawn_bot(pos: Vector3) -> void:
+func _spawn_allies() -> void:
+	var positions := [
+		Vector3(-4, 1.1, 13), Vector3(4, 1.1, 13),
+		Vector3(-9, 1.1, 16), Vector3(9, 1.1, 16)
+	]
+	for i in range(4):
+		_spawn_bot(positions[i], true)
+
+func _spawn_enemies() -> void:
+	for pos in _enemy_spawn_positions():
+		_spawn_bot(pos, false)
+
+func _spawn_bot(pos: Vector3, is_ally: bool) -> void:
 	var bot := CharacterBody3D.new()
-	bot.name = "BlockBot_%d" % bots.size()
+	bot.name = ("AllyBot_%d" % allies.size()) if is_ally else ("EnemyBot_%d" % bots.size())
 	bot.position = pos
 	bot.set_meta("hp", 100)
+	bot.set_meta("team", "blue" if is_ally else "red")
 	bot.set_meta("fire_timer", randf_range(0.7, 1.8))
 	var collision := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
@@ -147,11 +156,15 @@ func _spawn_bot(pos: Vector3) -> void:
 	capsule.height = 1.8
 	collision.shape = capsule
 	bot.add_child(collision)
-	_add_bot_cube(bot, Vector3(0, 0.05, 0), Vector3(0.72, 0.95, 0.42), Color("#a84a3d"))
+	var team_color := Color("#3d78c5") if is_ally else Color("#b8413b")
+	_add_bot_cube(bot, Vector3(0, 0.05, 0), Vector3(0.72, 0.95, 0.42), team_color)
 	_add_bot_cube(bot, Vector3(0, 0.78, 0), Vector3(0.58, 0.58, 0.58), Color("#d5a47b"))
 	_add_bot_cube(bot, Vector3(0, 0.83, -0.30), Vector3(0.34, 0.12, 0.06), Color("#242424"))
 	add_child(bot)
-	bots.append(bot)
+	if is_ally:
+		allies.append(bot)
+	else:
+		bots.append(bot)
 
 func _add_bot_cube(parent: Node3D, pos: Vector3, dimensions: Vector3, color: Color) -> void:
 	var mesh := MeshInstance3D.new()
@@ -243,27 +256,60 @@ func _physics_process(delta: float) -> void:
 	player.velocity.x = direction.x * 7.0
 	player.velocity.z = direction.z * 7.0
 	player.move_and_slide()
-	for bot in bots:
-		if not is_instance_valid(bot):
-			continue
-		var to_player := player.global_position - bot.global_position
-		var distance := to_player.length()
-		if distance > 2.5:
-			var move_dir := Vector3(to_player.x, 0, to_player.z).normalized()
-			bot.velocity.x = move_dir.x * 2.3
-			bot.velocity.z = move_dir.z * 2.3
-			bot.rotation.y = atan2(-move_dir.x, -move_dir.z)
+	# Both teams seek opponents and exchange fire.
+	for bot in allies.duplicate():
+		_process_combat_bot(bot, bots, true, delta)
+	for bot in bots.duplicate():
+		_process_combat_bot(bot, allies, false, delta)
+
+func _process_combat_bot(bot: CharacterBody3D, opponents: Array[CharacterBody3D], is_ally: bool, delta: float) -> void:
+	if not is_instance_valid(bot):
+		return
+	var targets: Array[Node3D] = []
+	for opponent in opponents:
+		if is_instance_valid(opponent):
+			targets.append(opponent)
+	if not is_ally and health > 0 and is_instance_valid(player):
+		targets.append(player)
+	if targets.is_empty():
+		bot.velocity.x = move_toward(bot.velocity.x, 0.0, 8.0 * delta)
+		bot.velocity.z = move_toward(bot.velocity.z, 0.0, 8.0 * delta)
+		return
+	var target: Node3D = targets[0]
+	var best_distance := bot.global_position.distance_to(target.global_position)
+	for candidate in targets:
+		var candidate_distance := bot.global_position.distance_to(candidate.global_position)
+		if candidate_distance < best_distance:
+			target = candidate
+			best_distance = candidate_distance
+	var to_target := target.global_position - bot.global_position
+	var flat_dir := Vector3(to_target.x, 0, to_target.z).normalized()
+	if best_distance > 8.0:
+		bot.velocity.x = flat_dir.x * 2.8
+		bot.velocity.z = flat_dir.z * 2.8
+	else:
+		bot.velocity.x = move_toward(bot.velocity.x, 0.0, 8.0 * delta)
+		bot.velocity.z = move_toward(bot.velocity.z, 0.0, 8.0 * delta)
+	bot.rotation.y = atan2(-flat_dir.x, -flat_dir.z)
+	if not bot.is_on_floor():
+		bot.velocity.y -= 22.0 * delta
+	bot.move_and_slide()
+	var timer := float(bot.get_meta("fire_timer", 1.0)) - delta
+	if best_distance < 20.0 and timer <= 0.0:
+		var damage := randi_range(5, 11)
+		if target == player:
+			health = maxi(0, health - damage)
 		else:
-			bot.velocity.x = move_toward(bot.velocity.x, 0.0, 8.0 * delta)
-			bot.velocity.z = move_toward(bot.velocity.z, 0.0, 8.0 * delta)
-		if not bot.is_on_floor():
-			bot.velocity.y -= 22.0 * delta
-		bot.move_and_slide()
-		var timer := float(bot.get_meta("fire_timer", 1.0)) - delta
-		if distance < 18.0 and timer <= 0.0:
-			health = maxi(0, health - randi_range(4, 9))
-			timer = randf_range(0.8, 1.6)
-		bot.set_meta("fire_timer", timer)
+			var target_hp := int(target.get_meta("hp", 100)) - damage
+			target.set_meta("hp", target_hp)
+			if target_hp <= 0:
+				if is_ally:
+					bots.erase(target)
+				else:
+					allies.erase(target)
+				target.queue_free()
+		timer = randf_range(0.8, 1.6)
+	bot.set_meta("fire_timer", timer)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not round_over:
@@ -323,9 +369,9 @@ func _update_hud() -> void:
 	var minutes := int(round_time) / 60
 	var seconds := int(round_time) % 60
 	var ammo_text := "ĐANG NẠP..." if reloading else "%d / %d" % [ammo, reserve_ammo]
-	var side_text := "BÊN B" if side_switched else "BÊN A"
+	var side_text := "ĐỘI XANH" if not side_switched else "ĐỘI ĐỎ"
 	var switch_text := "ĐÃ ĐỔI BÊN" if side_switched else "ĐỔI BÊN KHI ĐẠT 7 HIỆP"
-	hud.text = "HIỆP %d   |   TỶ SỐ %d - %d\\n%s   |   MÁU: %d   |   ĐẠN: %s\\nĐỊCH CÒN: %d/5   |   %s   |   %02d:%02d" % [round_number, player_round_wins, enemy_round_wins, side_text, health, ammo_text, bots.size(), switch_text, minutes, seconds]
+	hud.text = "HIỆP %d   |   TỶ SỐ %d - %d\\n%s   |   MÁU: %d   |   ĐẠN: %s\\nĐỊCH CÒN: %d/5   |   ĐỒNG ĐỘI CÒN: %d/4   |   %s   |   %02d:%02d" % [round_number, player_round_wins, enemy_round_wins, side_text, health, ammo_text, bots.size(), allies.size(), switch_text, minutes, seconds]
 
 func _finish_round(player_won: bool, reason: String) -> void:
 	if round_over or intermission_time > 0.0:
@@ -361,16 +407,17 @@ func _begin_next_round() -> void:
 	reload_time = 0.0
 	round_time = ROUND_LENGTH
 	fire_cooldown = 0.0
-	for bot in bots:
+	for bot in bots + allies:
 		if is_instance_valid(bot):
 			bot.queue_free()
 	bots.clear()
+	allies.clear()
 	player.position = Vector3(0, 1.2, -15 if side_switched else 15)
 	player.velocity = Vector3.ZERO
 	player.rotation = Vector3.ZERO
 	camera.rotation = Vector3.ZERO
-	for pos in _enemy_spawn_positions():
-		_spawn_bot(pos)
+	_spawn_allies()
+	_spawn_enemies()
 	center_message.visible = false
 	_update_hud()
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
