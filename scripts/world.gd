@@ -55,8 +55,11 @@ func terrain_height(x: int, z: int) -> int:
 	return clampi(9 + int(terrain_noise.get_noise_2d(x, z) * 10.0), 3, MAX_HEIGHT - 4)
 
 func generate_world() -> void:
-	blocks.clear()
+	for node in chunk_nodes.values():
+		if is_instance_valid(node):
+			node.queue_free()
 	chunk_nodes.clear()
+	blocks.clear()
 	for x in range(WORLD_SIZE):
 		for z in range(WORLD_SIZE):
 			var h := terrain_height(x, z)
