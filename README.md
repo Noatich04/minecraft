@@ -5,7 +5,7 @@ Prototype game voxel sinh tồn lấy cảm hứng từ Minecraft, viết bằng
 ## Tính năng hiện có
 
 - Trang chủ phong cách voxel: Sinh tồn, Đấu súng FPS, Máy chủ, Cài đặt, Thoát game.
-- Chế độ đấu súng góc nhìn thứ nhất: đấu với 5 bot, súng dạng khối, đạn/nạp đạn, máu, vật cản voxel; mục tiêu 15 mạng trong 3 phút.
+- Chế độ đấu súng FPS theo đội 5v5: người chơi + 4 đồng đội bot đấu với 5 bot địch; bot hai bên tìm mục tiêu và giao tranh, đồng đội có thể bị hạ; hiệp thắng khi một đội bị tiêu diệt hoàn toàn hoặc hết giờ; đổi bên khi một đội đạt 7 hiệp thắng; đội đầu tiên đạt 10 hiệp thắng sẽ thắng trận.
 - Màn hình Máy chủ có mục thế giới thử nghiệm và thông báo rõ đây hiện là chơi cục bộ; multiplayer online chưa được triển khai.
 - Thế giới voxel 64 × 64, sinh địa hình theo noise với đồi/núi, lớp cỏ/đất/đá, hang động đơn giản và cây.
 - Góc nhìn người thứ nhất, di chuyển WASD, nhảy, trọng lực và va chạm địa hình.
@@ -28,22 +28,10 @@ Prototype game voxel sinh tồn lấy cảm hứng từ Minecraft, viết bằng
 | W / A / S / D | Di chuyển |
 | Space | Nhảy |
 | Chuột | Ngắm nhìn |
-| Chuột trái | Bắn súng hitscan |
-| R | Nạp đạn |
-| Esc | Thả chuột |
-| Enter | Chơi lại sau khi kết thúc ván |
-
-## Điều khiển chế độ đấu súng FPS
-
-| Phím | Tác dụng |
-|---|---|
-| W / A / S / D | Di chuyển |
-| Space | Nhảy |
-| Chuột | Ngắm nhìn |
 | Chuột trái | Bắn súng |
 | R | Nạp đạn |
 | Esc | Thả chuột |
-| Enter | Chơi lại sau khi kết thúc ván |
+| Enter | Chơi lại sau khi kết thúc trận |
 
 ## Điều khiển trong game
 
