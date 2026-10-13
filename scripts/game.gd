@@ -26,7 +26,7 @@ func _ready() -> void:
 	_build_hud()
 	_spawn_mobs()
 	refresh_hud()
-	show_message("Chào mừng! Phá khối bằng chuột trái, đặt khối bằng chuột phải.")
+	show_message("Sinh tồn: slime gây sát thương. Thu thập gỗ/đá để chế tạo đồ.")
 
 func _process(delta: float) -> void:
 	if message_timer > 0.0:
@@ -58,7 +58,7 @@ func _build_hud() -> void:
 	add_child(canvas)
 	hud_label = Label.new()
 	hud_label.position = Vector2(18, 14)
-	hud_label.add_theme_font_size_override("font_size", 20)
+	hud_label.add_theme_font_size_override("font_size", 18)
 	hud_label.add_theme_color_override("font_color", Color.WHITE)
 	canvas.add_child(hud_label)
 	var crosshair := Label.new()
@@ -69,26 +69,26 @@ func _build_hud() -> void:
 	crosshair.add_theme_color_override("font_color", Color.WHITE)
 	canvas.add_child(crosshair)
 	help_label = Label.new()
-	help_label.text = "WASD: di chuyển  |  Space: nhảy  |  Chuột trái: phá  |  Chuột phải: đặt\n1-5: chọn khối  |  E: túi đồ  |  C: chế tạo  |  F5: lưu  |  F9: tải  |  Esc: thả chuột"
-	help_label.position = Vector2(18, 635)
-	help_label.add_theme_font_size_override("font_size", 15)
+	help_label.text = "WASD di chuyển | Space nhảy | Chuột trái phá/đánh | Chuột phải đặt\n1-6 chọn khối | 7 kiếm gỗ | 8 kiếm đá | E túi đồ | F5 lưu | F9 tải | Esc thả chuột\nC ván | V que | B cuốc gỗ | N kiếm gỗ | M cuốc đá | J kiếm đá | K đuốc"
+	help_label.position = Vector2(18, 585)
+	help_label.add_theme_font_size_override("font_size", 14)
 	help_label.add_theme_color_override("font_color", Color.WHITE)
 	canvas.add_child(help_label)
 	message_label = Label.new()
 	message_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	message_label.position = Vector2(-300, 70)
-	message_label.size = Vector2(600, 40)
+	message_label.position = Vector2(-320, 70)
+	message_label.size = Vector2(640, 40)
 	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	message_label.add_theme_font_size_override("font_size", 18)
 	message_label.add_theme_color_override("font_color", Color.WHITE)
 	canvas.add_child(message_label)
 	inventory_panel = PanelContainer.new()
-	inventory_panel.position = Vector2(18, 110)
-	inventory_panel.custom_minimum_size = Vector2(300, 220)
+	inventory_panel.position = Vector2(18, 115)
+	inventory_panel.custom_minimum_size = Vector2(370, 440)
 	inventory_panel.visible = false
 	canvas.add_child(inventory_panel)
 	inventory_label = Label.new()
-	inventory_label.add_theme_font_size_override("font_size", 17)
+	inventory_label.add_theme_font_size_override("font_size", 16)
 	inventory_panel.add_child(inventory_label)
 
 func _spawn_mobs() -> void:
@@ -107,19 +107,25 @@ func refresh_hud() -> void:
 		return
 	var inventory: Dictionary = player.inventory
 	var selected := int(player.selected_block)
-	hud_label.text = "Máu: %d/20    Đói: %d/20\nĐang chọn: %s (%d)\n1 Cỏ: %d | 2 Đất: %d | 3 Đá: %d | 4 Gỗ: %d | 5 Lá: %d | 6 Ván: %d" % [
-		player.health, player.hunger, VoxelWorld.BLOCK_NAMES.get(selected, "Khối"), selected,
+	var weapon_text := "Không cầm vũ khí"
+	if player.selected_weapon != 0:
+		weapon_text = player.item_name(player.selected_weapon)
+	hud_label.text = "Máu: %d/20    Đói: %d/20\nKhối: %s (%d) | Vũ khí: %s\nCỏ: %d | Đất: %d | Đá: %d | Gỗ: %d | Ván: %d" % [
+		player.health, player.hunger, VoxelWorld.BLOCK_NAMES.get(selected, "Khối"), selected, weapon_text,
 		int(inventory.get(1, 0)), int(inventory.get(2, 0)), int(inventory.get(3, 0)),
-		int(inventory.get(4, 0)), int(inventory.get(5, 0)), int(inventory.get(7, 0))
+		int(inventory.get(4, 0)), int(inventory.get(7, 0))
 	]
 	if inventory_open:
 		_update_inventory_panel()
 
 func _update_inventory_panel() -> void:
 	var inventory: Dictionary = player.inventory
-	inventory_label.text = "TÚI ĐỒ & CHẾ TẠO\n\nCỏ: %d\nĐất: %d\nĐá: %d\nGỗ: %d\nLá: %d\nCát: %d\nVán gỗ: %d\n\nNhấn C: 1 gỗ -> 4 ván\nNhấn 6 để chọn ván\nNhấn E để đóng túi đồ" % [
+	inventory_label.text = "TÚI ĐỒ & CÔNG THỨC\n\nKHỐI\nCỏ: %d   Đất: %d   Đá: %d\nGỗ: %d   Lá: %d   Cát: %d\nVán gỗ: %d\n\nVẬT PHẨM\nQue gỗ: %d   Cuốc gỗ: %d   Kiếm gỗ: %d\nCuốc đá: %d   Kiếm đá: %d\nĐuốc: %d   Gel slime: %d\n\nCÔNG THỨC (bấm phím)\nC: 1 gỗ → 4 ván gỗ\nV: 2 ván gỗ → 4 que gỗ\nB: 3 ván + 2 que → cuốc gỗ\nN: 2 ván + 1 que → kiếm gỗ\nM: 3 đá + 2 que → cuốc đá\nJ: 2 đá + 1 que → kiếm đá\nK: 1 gỗ + 1 que → 4 đuốc\n\nKiếm gỗ gây 3 sát thương; kiếm đá gây 5.\nNhấn E để đóng túi đồ." % [
 		int(inventory.get(1, 0)), int(inventory.get(2, 0)), int(inventory.get(3, 0)),
-		int(inventory.get(4, 0)), int(inventory.get(5, 0)), int(inventory.get(6, 0))
+		int(inventory.get(4, 0)), int(inventory.get(5, 0)), int(inventory.get(6, 0)),
+		int(inventory.get(7, 0)), int(inventory.get(101, 0)), int(inventory.get(102, 0)),
+		int(inventory.get(103, 0)), int(inventory.get(104, 0)), int(inventory.get(105, 0)),
+		int(inventory.get(106, 0)), int(inventory.get(108, 0))
 	]
 
 func toggle_inventory() -> void:
