@@ -1,4 +1,5 @@
 extends CharacterBody3D
+class_name VoxelPlayer
 
 const SPEED := 6.0
 const JUMP_VELOCITY := 7.0
