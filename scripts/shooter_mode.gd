@@ -290,7 +290,7 @@ func _shoot() -> void:
 			target.set_meta("hp", hp)
 			if hp <= 0:
 				bots.erase(target)
-			target.queue_free()
+				target.queue_free()
 				kills += 1
 				if not round_over:
 					_spawn_bot(_random_bot_spawn())
