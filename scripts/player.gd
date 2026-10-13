@@ -12,7 +12,6 @@ var hunger := 20
 var inventory: Dictionary = {1: 12, 2: 20, 3: 8, 4: 4, 5: 0, 6: 0}
 var selected_block := 1
 var survival_clock := 0.0
-var attack_cooldown := 0.0
 
 func _ready() -> void:
 	world = get_parent().get_node("World") as VoxelWorld
@@ -24,21 +23,28 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotate_x(-event.relative.y * 0.0025)
 		camera.rotation.x = clampf(camera.rotation.x, -1.50, 1.50)
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_ESCAPE:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		elif event.keycode == KEY_1: selected_block = 1
-		elif event.keycode == KEY_2: selected_block = 2
-		elif event.keycode == KEY_3: selected_block = 3
-		elif event.keycode == KEY_4: selected_block = 4
-		elif event.keycode == KEY_5: selected_block = 5
-		elif event.keycode == KEY_F5:
-			get_parent().save_game()
-		elif event.keycode == KEY_F9:
-			get_parent().load_game()
-		elif event.keycode == KEY_E:
-			get_parent().toggle_inventory()
-		elif event.keycode == KEY_C:
-			craft_recipe()
+		match event.keycode:
+			KEY_ESCAPE:
+				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			KEY_1:
+				selected_block = VoxelWorld.GRASS
+			KEY_2:
+				selected_block = VoxelWorld.DIRT
+			KEY_3:
+				selected_block = VoxelWorld.STONE
+			KEY_4:
+				selected_block = VoxelWorld.WOOD
+			KEY_5:
+				selected_block = VoxelWorld.LEAVES
+			KEY_F5:
+				get_parent().save_game()
+			KEY_F9:
+				get_parent().load_game()
+			KEY_E:
+				get_parent().toggle_inventory()
+			KEY_C:
+				craft_recipe()
+		get_parent().refresh_hud()
 	if event is InputEventMouseButton and event.pressed:
 		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -72,7 +78,17 @@ func _physics_process(delta: float) -> void:
 	if health <= 0:
 		health = 20
 		hunger = 15
-		global_position = Vector3(32, 22, 32)
+		global_position = Vector3(32.5, world.terrain_height(32, 32) + 4.0, 32.5)
+		get_parent().show_message("Bạn đã hồi sinh.")
+
+func take_damage(amount: int = 1) -> void:
+	health = maxi(0, health - amount)
+	get_parent().refresh_hud()
+	if health <= 0:
+		show_death_message()
+
+func show_death_message() -> void:
+	get_parent().show_message("Bạn đã gục ngã... đang hồi sinh.")
 
 func raycast_block() -> Dictionary:
 	var from := camera.global_position
@@ -86,7 +102,16 @@ func mine_block() -> void:
 	var hit := raycast_block()
 	if hit.is_empty():
 		return
-	var block_pos := Vector3i(floori(hit.position.x - hit.normal.x * 0.02), floori(hit.position.y - hit.normal.y * 0.02), floori(hit.position.z - hit.normal.z * 0.02))
+	var collider = hit.get("collider")
+	if collider != null and collider.has_method("take_hit"):
+		collider.take_hit(1)
+		get_parent().show_message("Đã đánh quái!")
+		return
+	var block_pos := Vector3i(
+		floori(hit.position.x - hit.normal.x * 0.02),
+		floori(hit.position.y - hit.normal.y * 0.02),
+		floori(hit.position.z - hit.normal.z * 0.02)
+	)
 	var kind := world.get_block(block_pos)
 	if kind == VoxelWorld.AIR:
 		return
@@ -98,7 +123,11 @@ func place_block() -> void:
 	var hit := raycast_block()
 	if hit.is_empty() or int(inventory.get(selected_block, 0)) <= 0:
 		return
-	var p := Vector3i(floori(hit.position.x + hit.normal.x * 0.02), floori(hit.position.y + hit.normal.y * 0.02), floori(hit.position.z + hit.normal.z * 0.02))
+	var p := Vector3i(
+		floori(hit.position.x + hit.normal.x * 0.02),
+		floori(hit.position.y + hit.normal.y * 0.02),
+		floori(hit.position.z + hit.normal.z * 0.02)
+	)
 	var center := Vector3(p) + Vector3(0.5, 0.5, 0.5)
 	if global_position.distance_to(center) < 1.35:
 		return
@@ -109,7 +138,6 @@ func place_block() -> void:
 		get_parent().refresh_hud()
 
 func craft_recipe() -> void:
-	# Simple starter recipe: combine two dirt blocks into one stone block.
 	if int(inventory.get(VoxelWorld.DIRT, 0)) >= 2:
 		inventory[VoxelWorld.DIRT] = int(inventory[VoxelWorld.DIRT]) - 2
 		inventory[VoxelWorld.STONE] = int(inventory.get(VoxelWorld.STONE, 0)) + 1
@@ -128,7 +156,7 @@ func save_player() -> Dictionary:
 	}
 
 func load_player(data: Dictionary) -> void:
-	var p: Array = data.get("position", [32, 22, 32])
+	var p: Array = data.get("position", [32.5, 22, 32.5])
 	if p.size() >= 3:
 		global_position = Vector3(float(p[0]), float(p[1]), float(p[2]))
 	health = int(data.get("health", 20))
