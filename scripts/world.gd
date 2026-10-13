@@ -11,14 +11,16 @@ const STONE := 3
 const WOOD := 4
 const LEAVES := 5
 const SAND := 6
-const BLOCK_NAMES := {GRASS: "Cỏ", DIRT: "Đất", STONE: "Đá", WOOD: "Gỗ", LEAVES: "Lá", SAND: "Cát"}
+const PLANKS := 7
+const BLOCK_NAMES := {GRASS: "Cỏ", DIRT: "Đất", STONE: "Đá", WOOD: "Gỗ", LEAVES: "Lá", SAND: "Cát", PLANKS: "Ván gỗ"}
 const BLOCK_COLORS := {
 	GRASS: Color(0.30, 0.67, 0.22),
 	DIRT: Color(0.45, 0.29, 0.16),
 	STONE: Color(0.48, 0.50, 0.53),
 	WOOD: Color(0.42, 0.27, 0.12),
 	LEAVES: Color(0.16, 0.48, 0.16),
-	SAND: Color(0.78, 0.70, 0.45)
+	SAND: Color(0.78, 0.70, 0.45),
+	PLANKS: Color(0.67, 0.43, 0.20)
 }
 
 var blocks: Dictionary = {}
