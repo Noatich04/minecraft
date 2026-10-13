@@ -107,17 +107,17 @@ func refresh_hud() -> void:
 		return
 	var inventory: Dictionary = player.inventory
 	var selected := int(player.selected_block)
-	hud_label.text = "Máu: %d/20    Đói: %d/20\nĐang chọn: %s (%d)\n1 Cỏ: %d | 2 Đất: %d | 3 Đá: %d | 4 Gỗ: %d | 5 Lá: %d" % [
+	hud_label.text = "Máu: %d/20    Đói: %d/20\nĐang chọn: %s (%d)\n1 Cỏ: %d | 2 Đất: %d | 3 Đá: %d | 4 Gỗ: %d | 5 Lá: %d | 6 Ván: %d" % [
 		player.health, player.hunger, VoxelWorld.BLOCK_NAMES.get(selected, "Khối"), selected,
 		int(inventory.get(1, 0)), int(inventory.get(2, 0)), int(inventory.get(3, 0)),
-		int(inventory.get(4, 0)), int(inventory.get(5, 0))
+		int(inventory.get(4, 0)), int(inventory.get(5, 0)), int(inventory.get(7, 0))
 	]
 	if inventory_open:
 		_update_inventory_panel()
 
 func _update_inventory_panel() -> void:
 	var inventory: Dictionary = player.inventory
-	inventory_label.text = "TÚI ĐỒ & CHẾ TẠO\n\nCỏ: %d\nĐất: %d\nĐá: %d\nGỗ: %d\nLá: %d\nCát: %d\n\nNhấn C: 2 đất -> 1 đá\nNhấn E để đóng túi đồ" % [
+	inventory_label.text = "TÚI ĐỒ & CHẾ TẠO\n\nCỏ: %d\nĐất: %d\nĐá: %d\nGỗ: %d\nLá: %d\nCát: %d\n\nNhấn C: 1 gỗ -> 4 ván\nNhấn 6 để chọn ván\nNhấn E để đóng túi đồ" % [
 		int(inventory.get(1, 0)), int(inventory.get(2, 0)), int(inventory.get(3, 0)),
 		int(inventory.get(4, 0)), int(inventory.get(5, 0)), int(inventory.get(6, 0))
 	]
