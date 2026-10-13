@@ -5,6 +5,7 @@ var attack_timer := 0.0
 var player: CharacterBody3D
 
 func _ready() -> void:
+	add_to_group("mobs")
 	player = get_parent().get_node("Player") as CharacterBody3D
 
 func _physics_process(delta: float) -> void:
@@ -26,8 +27,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	if distance < 1.7 and attack_timer <= 0.0:
 		attack_timer = 1.3
-		if player.has_method("take_damage"):
-			player.take_damage(1)
+		player.take_damage(1)
 
 func take_hit(damage: int = 1) -> void:
 	health -= damage
